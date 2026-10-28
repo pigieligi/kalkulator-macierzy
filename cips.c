@@ -61,7 +61,7 @@ int i, j;
 int wA = 2, kA = 3, wB = 2, kB = 3;
 double A[MAX][MAX] = {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}};
 double B[MAX][MAX] = {{7.0, 8.0, 9.0}, {10.0, 11.0, 12.0}};
-double C[MAX][MAX] = {{MAX}, {MAX}};
+double C[MAX][MAX] = {{0.0}, {0.0}};
 
 wypisz(A, wA, kA);
 wypisz(B, wB, kB);
