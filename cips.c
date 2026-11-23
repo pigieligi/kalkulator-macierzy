@@ -1,85 +1,63 @@
+#include "cipus.h"
+#include "matrix.h"
 #include <stdio.h>
-#define MAX 20
-
-void wypisz(double M[][MAX], int w, int l)
-{
-    int i, j;
-
-    for (i = 0; i < w; i++) {
-        for (j = 0; j < l; j++) {
-            printf("%8.2f", M[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-int wymiary_poprawne(int w, int k)
-{
-    return (w >= 1 && w <= MAX && k >= 1 && k <= MAX);
-}
-
-int zgodne_do_sumy(int wA, int kA, int wB, int kB);
-
-void dodaj(double A[][MAX], double B[][MAX], double C[][MAX], int w, int k)
-{
-    int i, j;
-    for (i = 0; i < w; i++) {
-        for (j = 0; j < k; j++) {
-            C[i][j] = A[i][j] + B[i][j];
-        }
-    }
-}
-
-void odejmij(double A[][MAX], double B[][MAX], double C[][MAX], int w, int k)
-{
-    int i, j;
-    for (i = 0; i < w; i++) {
-        for (j = 0; j < k; j++) {
-            C[i][j] = A[i][j] - B[i][j];
-        }
-    }
-}
-
-void pomnoz(double A[][MAX], double B[][MAX], double C[][MAX], int wA, int kA, int wB, int kB)
-{
-    int i, j, n;
-    double suma;
-    for (i = 0; i < wA; i++) {
-        for (j = 0; j < kB; j++) {
-            suma = 0.0;
-            for (n = 0; n < kA; n++) {
-                suma = suma +A[i][n] * B[n][j];
-            }
-            C[i][j] = suma;
-        }
-    }
-}
 
 int main(void) {
+  double A[MAX][MAX], B[MAX][MAX], C[MAX][MAX];
+  int wA, kA, wB, kB, wC, kC, op;
 
-int i, j;
-int wA = 2, kA = 3, wB = 2, kB = 3;
-double A[MAX][MAX] = {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}};
-double B[MAX][MAX] = {{7.0, 8.0, 9.0}, {10.0, 11.0, 12.0}};
-double C[MAX][MAX] = {{0.0}, {0.0}};
+  if (wczytaj_macierz("cipsa.txt", A, &wA, &kA) != 0) {
+    printf("Blad: nie mozna wczytac macierzy A\n");
+    return 1;
+  }
 
-wypisz(A, wA, kA);
-wypisz(B, wB, kB);
-wypisz(C, wA, kA);
+  if (wczytaj_macierz("cipsem.txt", B, &wB, &kB) != 0) {
+    printf("Blad: nie mozna wczytac macierzy B\n");
+    return 1;
+  }
 
-printf("Suma A + B\n");
-dodaj(A, B, C, wA, kA);
-wypisz(C, wA, kA);
+  printf("Operacja: 1 - dodawanie, 2 - odejmowanie, 3 - mnozenie\n");
 
-printf("Roznica A - B\n");
-odejmij(A, B, C, wA, kA);
-wypisz(C, wA, kA);
+  if (scanf("%d", &op) != 1) {
+    fprintf(stderr, "Wpisz numer operacji jako liczbe.\n");
+    return 1;
+  }
 
-printf("Iloczyn A * B\n");
-pomnoz(A, B, C, wA, kA, wB, kB);
-wypisz(C, wA, kB);
-return 0;
+  if (op == 1 || op == 2) {
+    if (wA != wB || kA != kB) {
+      fprintf(
+          stderr,
+          "Do dodawania i odejmwoania macierze musza miec te same wymiary.\n");
+      return 1;
+    }
 
+    if (op == 1) {
+      dodaj(A, B, C, wA, kA);
+    } else {
+      odejmij(A, B, C, wA, kA);
+    }
+
+    wC = wA;
+    kC = kA;
+  } else if (op == 3) {
+    if (kA != wB) {
+      fprintf(stderr, "Liczba kolumn A musi byc rowna liczbie wierszy B.\n");
+      return 1;
+    }
+
+    pomnoz(A, B, C, wA, kA, kB);
+    wC = wA;
+    kC = kB;
+  } else {
+    fprintf(stderr, "Wybierz 1, 2 lub 3.\n");
+    return 1;
+  }
+
+  if (utworz_macierz(C, wC, kC) != 0) {
+    return 1;
+  }
+
+  printf("Wynik zapisano do pliku wynik.txt\n");
+
+  return 0;
 }
-
-
